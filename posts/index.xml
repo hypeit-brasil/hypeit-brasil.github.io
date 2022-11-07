@@ -1,0 +1,526 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Posts on HypeIT</title>
+    <link>https://hypeit.tech/posts/</link>
+    <description>Recent content in Posts on HypeIT</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <lastBuildDate>Sun, 06 Nov 2022 02:19:57 -0300</lastBuildDate><atom:link href="https://hypeit.tech/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Gerenciando estado no React com Zustand</title>
+      <link>https://hypeit.tech/posts/zustand/</link>
+      <pubDate>Sun, 06 Nov 2022 02:19:57 -0300</pubDate>
+      
+      <guid>https://hypeit.tech/posts/zustand/</guid>
+      <description>Você certamente já se deparou com a necessidade de consumir um estado compartilhado entre vários componentes no React em lugares distintos de sua aplicação e certamente já ouviu falar sobre o Redux como uma ferramenta robusta de gerenciar o estado.
+Embora muito utilizado e bem documentado, é inegável que muitas vezes sua utilização é um bocado verbosa, necessitando de muito boilerplate para conseguir atingir uma funcionalidade básica.
+Neste artigo iremos utilizar um gerenciador de estado leve, rápido e de fácil utilização chamado zustand para resolver um problema de gerenciamento de estado de uma aplicação e vamos analisar suas principais características e pontos fortes.</description>
+      <content:encoded><![CDATA[<p>Você certamente já se deparou com a necessidade de consumir um estado compartilhado entre
+vários componentes no React em lugares distintos de sua aplicação e
+certamente já ouviu falar sobre o Redux como uma ferramenta robusta de gerenciar o estado.</p>
+<p>Embora muito utilizado e bem documentado, é inegável que muitas vezes sua
+utilização é um bocado <em><strong>verbosa</strong></em>, necessitando de muito <em><strong>boilerplate</strong></em>
+para conseguir atingir uma funcionalidade básica.</p>
+<p>Neste artigo iremos utilizar um gerenciador de estado leve, rápido e de fácil
+utilização chamado <em><strong>zustand</strong></em> para resolver um problema de gerenciamento de estado de uma aplicação e vamos analisar suas principais características e pontos fortes.</p>
+<h1 id="setup">Setup</h1>
+<p>Primeiramente, iremos criar uma nova aplicação react, neste tutorial
+utilizaremos o <strong>vite</strong>.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="line"><span class="cl">npm create vite@latest -- --template react-ts
+</span></span></code></pre></div><p>em seguida ele irá pedir por um nome e irá criar um diretório com o código fonte
+do seu projeto, agora basta realizar a instalação dos módulos:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="line"><span class="cl"><span class="nb">cd</span> pasta-do-projeto
+</span></span><span class="line"><span class="cl">npm i zustand
+</span></span></code></pre></div><h2 id="instalando-chakra-ui">Instalando Chakra UI</h2>
+<p>Com o módulo do <strong>zustand</strong> instalado já estamos prontos para utilizar a biblioteca,
+porém, irei utilizar uma biblioteca de elementos de UI para agilizar na
+estilização da aplicação, o
+<a href="https://chakra-ui.com/getting-started/vite-guide">Chakra UI</a>.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">npm i @chakra-ui/react @emotion/react@^11 @emotion/styled@^11 framer-motion@^6
+</span></span></code></pre></div><p><br>
+Modificando o arquivo: <code>src/main.tsx</code></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-tsx" data-lang="tsx"><span class="line"><span class="cl"><span class="kr">import</span> <span class="nx">React</span> <span class="kr">from</span> <span class="s2">&#34;react&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="kr">import</span> <span class="nx">ReactDOM</span> <span class="kr">from</span> <span class="s2">&#34;react-dom/client&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="kr">import</span> <span class="nx">App</span> <span class="kr">from</span> <span class="s2">&#34;./App&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="kr">import</span> <span class="p">{</span> <span class="nx">ChakraProvider</span> <span class="p">}</span> <span class="kr">from</span> <span class="s2">&#34;@chakra-ui/react&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nx">ReactDOM</span><span class="p">.</span><span class="nx">createRoot</span><span class="p">(</span><span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s2">&#34;root&#34;</span><span class="p">)</span> <span class="kr">as</span> <span class="nx">HTMLElement</span><span class="p">).</span><span class="nx">render</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">  <span class="p">&lt;</span><span class="nt">React.StrictMode</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">&lt;</span><span class="nt">ChakraProvider</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">      <span class="p">&lt;</span><span class="nt">App</span> <span class="p">/&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">&lt;/</span><span class="nt">ChakraProvider</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">&lt;/</span><span class="nt">React.StrictMode</span><span class="p">&gt;,</span>
+</span></span><span class="line"><span class="cl"><span class="p">);</span>
+</span></span></code></pre></div><h2 id="excluindo-arquivos-desnecessários">Excluindo arquivos desnecessários</h2>
+<p>Agora, delete os arquivos:</p>
+<ul>
+<li><code>src/App.css</code>;</li>
+<li><code>src/index.css</code>;</li>
+<li><code>src/assets/react.svg</code>.</li>
+</ul>
+<p>e em <code>App.tsx</code> apague todo o conteúdo, deixando uma estrutura básica de
+componente:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-tsx" data-lang="tsx"><span class="line"><span class="cl"><span class="kr">import</span> <span class="nx">React</span> <span class="kr">from</span> <span class="s2">&#34;react&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kr">export</span> <span class="kr">const</span> <span class="nx">App</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="p">&lt;</span><span class="nt">div</span> <span class="p">/&gt;;</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kr">export</span> <span class="k">default</span> <span class="nx">App</span><span class="p">;</span>
+</span></span></code></pre></div><h2 id="modificando-script-de-inicialização">Modificando script de inicialização</h2>
+<p>Por padrão o <strong>vite</strong> sobe a aplicação de desenvolvimento em alguma porta
+aleatória e isso é muito chato para o desenvolvimento, portanto, no arquivo
+<code>package.json</code> iremos modificar a <code>linha 7</code> para especificar uma porta padrão,
+neste caso utilizaremos a porta <code>3333</code>.</p>
+<pre tabindex="0"><code>&#34;scripts&#34;: {
+  &#34;dev&#34;: &#34;vite --port 3333&#34;,
+  ...
+},
+</code></pre><h1 id="criando-a-base-da-aplicação">Criando a base da aplicação</h1>
+<p>Nossa aplicação de exemplo será simples, porém terá uma série de oportunidades
+de demonstrar como podemos utilizar o gerenciamento de estado do <strong>Zustand</strong> em
+ação.</p>
+<p>A aplicação será um fragmento de um E-commerce, contendo um componente para
+definir o endereço de entrega do destinatário e um outro componente para
+apresentar o endereço de entrega salvo.</p>
+<p>Eles serão:</p>
+<ul>
+<li><code>src/components/AddressForm.tsx</code></li>
+<li><code>src/components/AddressSummary.tsx</code></li>
+</ul>
+ 
+
+<details>
+    <summary>Código do AddressForm.tsx</summary>
+
+    <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-tsx" data-lang="tsx"><span class="line"><span class="cl"><span class="kr">import</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">Button</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">FormControl</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">FormHelperText</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">FormLabel</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">Input</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">Select</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">VStack</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span> <span class="kr">from</span> <span class="s2">&#34;@chakra-ui/react&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="kr">import</span> <span class="nx">React</span><span class="p">,</span> <span class="p">{</span> <span class="nx">useState</span> <span class="p">}</span> <span class="kr">from</span> <span class="s2">&#34;react&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kr">const</span> <span class="nx">AddressForm</span>: <span class="kt">React.FC</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="kr">const</span> <span class="p">[</span><span class="nx">uf</span><span class="p">,</span> <span class="nx">setUf</span><span class="p">]</span> <span class="o">=</span> <span class="nx">useState</span><span class="p">(</span><span class="s2">&#34;&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="kr">const</span> <span class="p">[</span><span class="nx">address</span><span class="p">,</span> <span class="nx">setAddress</span><span class="p">]</span> <span class="o">=</span> <span class="nx">useState</span><span class="p">(</span><span class="s2">&#34;&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="kr">const</span> <span class="p">[</span><span class="nx">complement</span><span class="p">,</span> <span class="nx">setComplement</span><span class="p">]</span> <span class="o">=</span> <span class="nx">useState</span><span class="p">(</span><span class="s2">&#34;&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="kr">const</span> <span class="nx">handleSubmit</span>: <span class="kt">React.FormEventHandler</span><span class="p">&lt;</span><span class="nt">HTMLDivElement</span><span class="p">&gt;</span> <span class="o">=</span> <span class="p">(</span><span class="nx">event</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">event</span><span class="p">.</span><span class="nx">preventDefault</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">alert</span><span class="p">(</span><span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">({</span>
+</span></span><span class="line"><span class="cl">      <span class="nx">uf</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">      <span class="nx">address</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">      <span class="nx">complement</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}));</span>
+</span></span><span class="line"><span class="cl">  <span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="p">&lt;</span><span class="nt">VStack</span> <span class="na">as</span><span class="o">=</span><span class="p">{</span><span class="s2">&#34;form&#34;</span><span class="p">}</span> <span class="na">onSubmit</span><span class="o">=</span><span class="p">{</span><span class="nx">handleSubmit</span><span class="p">}&gt;</span>
+</span></span><span class="line"><span class="cl">      <span class="p">&lt;</span><span class="nt">FormControl</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">&lt;</span><span class="nt">FormLabel</span><span class="p">&gt;</span><span class="nx">Estado</span><span class="p">&lt;/</span><span class="nt">FormLabel</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">&lt;</span><span class="nt">Select</span>
+</span></span><span class="line"><span class="cl">          <span class="na">value</span><span class="o">=</span><span class="p">{</span><span class="nx">uf</span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">          <span class="na">onChange</span><span class="o">=</span><span class="p">{(</span><span class="nx">e</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">setUf</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">target</span><span class="p">.</span><span class="nx">value</span><span class="p">)}</span>
+</span></span><span class="line"><span class="cl">          <span class="na">bg</span><span class="o">=</span><span class="p">{</span><span class="s2">&#34;white&#34;</span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">          <span class="na">placeholder</span><span class="o">=</span><span class="s">&#34;Selecione sua Unidade Federativa&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">          <span class="p">&lt;</span><span class="nt">option</span> <span class="na">value</span><span class="o">=</span><span class="s">&#34;AC&#34;</span><span class="p">&gt;</span><span class="nx">Acre</span><span class="p">&lt;/</span><span class="nt">option</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">          <span class="p">&lt;</span><span class="nt">option</span> <span class="na">value</span><span class="o">=</span><span class="s">&#34;AL&#34;</span><span class="p">&gt;</span><span class="nx">Alagoas</span><span class="p">&lt;/</span><span class="nt">option</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">          <span class="p">&lt;</span><span class="nt">option</span> <span class="na">value</span><span class="o">=</span><span class="s">&#34;AP&#34;</span><span class="p">&gt;</span><span class="nx">Amapá</span><span class="p">&lt;/</span><span class="nt">option</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">          <span class="p">&lt;</span><span class="nt">option</span> <span class="na">value</span><span class="o">=</span><span class="s">&#34;AM&#34;</span><span class="p">&gt;</span><span class="nx">Amazonas</span><span class="p">&lt;/</span><span class="nt">option</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">          <span class="p">&lt;</span><span class="nt">option</span> <span class="na">value</span><span class="o">=</span><span class="s">&#34;BA&#34;</span><span class="p">&gt;</span><span class="nx">Bahia</span><span class="p">&lt;/</span><span class="nt">option</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">          <span class="p">&lt;</span><span class="nt">option</span> <span class="na">value</span><span class="o">=</span><span class="s">&#34;CE&#34;</span><span class="p">&gt;</span><span class="nx">Ceará</span><span class="p">&lt;/</span><span class="nt">option</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">          <span class="p">&lt;</span><span class="nt">option</span> <span class="na">value</span><span class="o">=</span><span class="s">&#34;DF&#34;</span><span class="p">&gt;</span><span class="nx">Distrito</span> <span class="nx">Federal</span><span class="p">&lt;/</span><span class="nt">option</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">          <span class="p">&lt;</span><span class="nt">option</span> <span class="na">value</span><span class="o">=</span><span class="s">&#34;ES&#34;</span><span class="p">&gt;</span><span class="nx">Espírito</span> <span class="nx">Santo</span><span class="p">&lt;/</span><span class="nt">option</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">          <span class="p">&lt;</span><span class="nt">option</span> <span class="na">value</span><span class="o">=</span><span class="s">&#34;GO&#34;</span><span class="p">&gt;</span><span class="nx">Goiás</span><span class="p">&lt;/</span><span class="nt">option</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">          <span class="p">&lt;</span><span class="nt">option</span> <span class="na">value</span><span class="o">=</span><span class="s">&#34;MA&#34;</span><span class="p">&gt;</span><span class="nx">Maranhão</span><span class="p">&lt;/</span><span class="nt">option</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">          <span class="p">&lt;</span><span class="nt">option</span> <span class="na">value</span><span class="o">=</span><span class="s">&#34;MT&#34;</span><span class="p">&gt;</span><span class="nx">Mato</span> <span class="nx">Grosso</span><span class="p">&lt;/</span><span class="nt">option</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">          <span class="p">&lt;</span><span class="nt">option</span> <span class="na">value</span><span class="o">=</span><span class="s">&#34;MS&#34;</span><span class="p">&gt;</span><span class="nx">Mato</span> <span class="nx">Grosso</span> <span class="k">do</span> <span class="nx">Sul</span><span class="p">&lt;/</span><span class="nt">option</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">          <span class="p">&lt;</span><span class="nt">option</span> <span class="na">value</span><span class="o">=</span><span class="s">&#34;MG&#34;</span><span class="p">&gt;</span><span class="nx">Minas</span> <span class="nx">Gerais</span><span class="p">&lt;/</span><span class="nt">option</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">          <span class="p">&lt;</span><span class="nt">option</span> <span class="na">value</span><span class="o">=</span><span class="s">&#34;PA&#34;</span><span class="p">&gt;</span><span class="nx">Pará</span><span class="p">&lt;/</span><span class="nt">option</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">          <span class="p">&lt;</span><span class="nt">option</span> <span class="na">value</span><span class="o">=</span><span class="s">&#34;PB&#34;</span><span class="p">&gt;</span><span class="nx">Paraíba</span><span class="p">&lt;/</span><span class="nt">option</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">          <span class="p">&lt;</span><span class="nt">option</span> <span class="na">value</span><span class="o">=</span><span class="s">&#34;PR&#34;</span><span class="p">&gt;</span><span class="nx">Paraná</span><span class="p">&lt;/</span><span class="nt">option</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">          <span class="p">&lt;</span><span class="nt">option</span> <span class="na">value</span><span class="o">=</span><span class="s">&#34;PE&#34;</span><span class="p">&gt;</span><span class="nx">Pernambuco</span><span class="p">&lt;/</span><span class="nt">option</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">          <span class="p">&lt;</span><span class="nt">option</span> <span class="na">value</span><span class="o">=</span><span class="s">&#34;PI&#34;</span><span class="p">&gt;</span><span class="nx">Piauí</span><span class="p">&lt;/</span><span class="nt">option</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">          <span class="p">&lt;</span><span class="nt">option</span> <span class="na">value</span><span class="o">=</span><span class="s">&#34;RJ&#34;</span><span class="p">&gt;</span><span class="nx">Rio</span> <span class="nx">de</span> <span class="nx">Janeiro</span><span class="p">&lt;/</span><span class="nt">option</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">          <span class="p">&lt;</span><span class="nt">option</span> <span class="na">value</span><span class="o">=</span><span class="s">&#34;RN&#34;</span><span class="p">&gt;</span><span class="nx">Rio</span> <span class="nx">Grande</span> <span class="k">do</span> <span class="nx">Norte</span><span class="p">&lt;/</span><span class="nt">option</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">          <span class="p">&lt;</span><span class="nt">option</span> <span class="na">value</span><span class="o">=</span><span class="s">&#34;RS&#34;</span><span class="p">&gt;</span><span class="nx">Rio</span> <span class="nx">Grande</span> <span class="k">do</span> <span class="nx">Sul</span><span class="p">&lt;/</span><span class="nt">option</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">          <span class="p">&lt;</span><span class="nt">option</span> <span class="na">value</span><span class="o">=</span><span class="s">&#34;RO&#34;</span><span class="p">&gt;</span><span class="nx">Rondônia</span><span class="p">&lt;/</span><span class="nt">option</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">          <span class="p">&lt;</span><span class="nt">option</span> <span class="na">value</span><span class="o">=</span><span class="s">&#34;RR&#34;</span><span class="p">&gt;</span><span class="nx">Roraima</span><span class="p">&lt;/</span><span class="nt">option</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">          <span class="p">&lt;</span><span class="nt">option</span> <span class="na">value</span><span class="o">=</span><span class="s">&#34;SC&#34;</span><span class="p">&gt;</span><span class="nx">Santa</span> <span class="nx">Catarina</span><span class="p">&lt;/</span><span class="nt">option</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">          <span class="p">&lt;</span><span class="nt">option</span> <span class="na">value</span><span class="o">=</span><span class="s">&#34;SP&#34;</span><span class="p">&gt;</span><span class="nx">São</span> <span class="nx">Paulo</span><span class="p">&lt;/</span><span class="nt">option</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">          <span class="p">&lt;</span><span class="nt">option</span> <span class="na">value</span><span class="o">=</span><span class="s">&#34;SE&#34;</span><span class="p">&gt;</span><span class="nx">Sergipe</span><span class="p">&lt;/</span><span class="nt">option</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">          <span class="p">&lt;</span><span class="nt">option</span> <span class="na">value</span><span class="o">=</span><span class="s">&#34;TO&#34;</span><span class="p">&gt;</span><span class="nx">Tocantins</span><span class="p">&lt;/</span><span class="nt">option</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">&lt;/</span><span class="nt">Select</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">      <span class="p">&lt;/</span><span class="nt">FormControl</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">      <span class="p">&lt;</span><span class="nt">FormControl</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">&lt;</span><span class="nt">FormLabel</span><span class="p">&gt;</span><span class="nx">Seu</span> <span class="nx">Endereço</span><span class="p">&lt;/</span><span class="nt">FormLabel</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">&lt;</span><span class="nt">Input</span>
+</span></span><span class="line"><span class="cl">          <span class="na">value</span><span class="o">=</span><span class="p">{</span><span class="nx">address</span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">          <span class="na">onChange</span><span class="o">=</span><span class="p">{(</span><span class="nx">e</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">setAddress</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">target</span><span class="p">.</span><span class="nx">value</span><span class="p">)}</span>
+</span></span><span class="line"><span class="cl">          <span class="na">bg</span><span class="o">=</span><span class="p">{</span><span class="s2">&#34;white&#34;</span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">          <span class="na">type</span><span class="o">=</span><span class="s">&#34;text&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">/&gt;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">&lt;</span><span class="nt">FormHelperText</span><span class="p">&gt;</span><span class="nx">Insira</span> <span class="nx">a</span> <span class="nx">rua</span> <span class="nx">e</span> <span class="nx">o</span> <span class="nx">número</span> <span class="p">(</span><span class="nx">se</span> <span class="nx">existente</span><span class="p">).&lt;/</span><span class="nt">FormHelperText</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">      <span class="p">&lt;/</span><span class="nt">FormControl</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">      <span class="p">&lt;</span><span class="nt">FormControl</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">&lt;</span><span class="nt">FormLabel</span><span class="p">&gt;</span><span class="nx">Complemento</span> <span class="p">(</span><span class="nx">opcional</span><span class="p">)&lt;/</span><span class="nt">FormLabel</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">&lt;</span><span class="nt">Input</span>
+</span></span><span class="line"><span class="cl">          <span class="na">value</span><span class="o">=</span><span class="p">{</span><span class="nx">complement</span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">          <span class="na">onChange</span><span class="o">=</span><span class="p">{(</span><span class="nx">e</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">setComplement</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">target</span><span class="p">.</span><span class="nx">value</span><span class="p">)}</span>
+</span></span><span class="line"><span class="cl">          <span class="na">bg</span><span class="o">=</span><span class="p">{</span><span class="s2">&#34;white&#34;</span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">          <span class="na">type</span><span class="o">=</span><span class="s">&#34;text&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">/&gt;</span>
+</span></span><span class="line"><span class="cl">      <span class="p">&lt;/</span><span class="nt">FormControl</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">      <span class="p">&lt;</span><span class="nt">Button</span>
+</span></span><span class="line"><span class="cl">        <span class="na">disabled</span><span class="o">=</span><span class="p">{</span><span class="nx">address</span><span class="p">.</span><span class="nx">length</span> <span class="o">===</span> <span class="mi">0</span> <span class="o">||</span> <span class="nx">uf</span><span class="p">.</span><span class="nx">length</span> <span class="o">===</span> <span class="mi">0</span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="na">alignSelf</span><span class="o">=</span><span class="p">{</span><span class="s2">&#34;end&#34;</span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="na">colorScheme</span><span class="o">=</span><span class="p">{</span><span class="s2">&#34;blue&#34;</span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="na">type</span><span class="o">=</span><span class="s">&#34;submit&#34;</span>
+</span></span><span class="line"><span class="cl">      <span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">Salvar</span>
+</span></span><span class="line"><span class="cl">      <span class="p">&lt;/</span><span class="nt">Button</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">&lt;/</span><span class="nt">VStack</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kr">export</span> <span class="k">default</span> <span class="nx">AddressForm</span><span class="p">;</span>
+</span></span></code></pre></div>
+
+</details>
+ 
+
+<details>
+    <summary>Código do AddressSummary.tsx</summary>
+
+    <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-tsx" data-lang="tsx"><span class="line"><span class="cl"><span class="kr">import</span> <span class="p">{</span> <span class="nx">Box</span><span class="p">,</span> <span class="nx">Text</span><span class="p">,</span> <span class="nx">VStack</span> <span class="p">}</span> <span class="kr">from</span> <span class="s2">&#34;@chakra-ui/react&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="kr">import</span> <span class="nx">React</span> <span class="kr">from</span> <span class="s2">&#34;react&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kr">const</span> <span class="nx">AddressSummary</span>: <span class="kt">React.FC</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="p">&lt;</span><span class="nt">VStack</span> <span class="na">spacing</span><span class="o">=</span><span class="p">{</span><span class="s2">&#34;4&#34;</span><span class="p">}</span> <span class="na">alignItems</span><span class="o">=</span><span class="p">{</span><span class="s2">&#34;start&#34;</span><span class="p">}&gt;</span>
+</span></span><span class="line"><span class="cl">      <span class="p">&lt;</span><span class="nt">Text</span> <span class="na">alignSelf</span><span class="o">=</span><span class="p">{</span><span class="s2">&#34;center&#34;</span><span class="p">}&gt;</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">Revise</span> <span class="kr">as</span> <span class="nx">informações</span> <span class="nx">abaixo</span> <span class="nx">antes</span> <span class="nx">de</span> <span class="nx">confirmar</span> <span class="nx">a</span> <span class="nx">compra</span>
+</span></span><span class="line"><span class="cl">      <span class="p">&lt;/</span><span class="nt">Text</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">      <span class="p">&lt;</span><span class="nt">Box</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">&lt;</span><span class="nt">Text</span> <span class="na">fontWeight</span><span class="o">=</span><span class="p">{</span><span class="s2">&#34;bold&#34;</span><span class="p">}&gt;</span><span class="nx">Estado</span><span class="p">&lt;/</span><span class="nt">Text</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">&lt;</span><span class="nt">Text</span> <span class="na">fontSize</span><span class="o">=</span><span class="p">{</span><span class="s2">&#34;lg&#34;</span><span class="p">}&gt;</span><span class="nx">SP</span><span class="p">&lt;/</span><span class="nt">Text</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">      <span class="p">&lt;/</span><span class="nt">Box</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">      <span class="p">&lt;</span><span class="nt">Box</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">&lt;</span><span class="nt">Text</span> <span class="na">fontWeight</span><span class="o">=</span><span class="p">{</span><span class="s2">&#34;bold&#34;</span><span class="p">}&gt;</span><span class="nx">Endereço</span><span class="p">&lt;/</span><span class="nt">Text</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">&lt;</span><span class="nt">Text</span> <span class="na">fontSize</span><span class="o">=</span><span class="p">{</span><span class="s2">&#34;lg&#34;</span><span class="p">}&gt;</span><span class="nx">Rua</span> <span class="nx">dos</span> <span class="nx">passarinhos</span><span class="p">,</span> <span class="mi">89</span><span class="p">&lt;/</span><span class="nt">Text</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">      <span class="p">&lt;/</span><span class="nt">Box</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">      <span class="p">&lt;</span><span class="nt">Box</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">&lt;</span><span class="nt">Text</span> <span class="na">fontWeight</span><span class="o">=</span><span class="p">{</span><span class="s2">&#34;bold&#34;</span><span class="p">}&gt;</span><span class="nx">Complemento</span><span class="p">&lt;/</span><span class="nt">Text</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">&lt;</span><span class="nt">Text</span> <span class="na">fontSize</span><span class="o">=</span><span class="p">{</span><span class="s2">&#34;lg&#34;</span><span class="p">}&gt;</span><span class="nx">apto</span> <span class="mi">104</span><span class="p">&lt;/</span><span class="nt">Text</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">      <span class="p">&lt;/</span><span class="nt">Box</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">&lt;/</span><span class="nt">VStack</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kr">export</span> <span class="k">default</span> <span class="nx">AddressSummary</span><span class="p">;</span>
+</span></span></code></pre></div>
+
+</details>
+<p><br>
+<code>src/App.tsx</code> contendo os dois componentes:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-tsx" data-lang="tsx"><span class="line"><span class="cl"><span class="kr">import</span> <span class="p">{</span> <span class="nx">Box</span><span class="p">,</span> <span class="nx">Container</span> <span class="p">}</span> <span class="kr">from</span> <span class="s2">&#34;@chakra-ui/react&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="kr">import</span> <span class="nx">AddressForm</span> <span class="kr">from</span> <span class="s2">&#34;./components/AddressForm&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="kr">import</span> <span class="nx">AddressSummary</span> <span class="kr">from</span> <span class="s2">&#34;./components/AddressSummary&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kr">export</span> <span class="kr">const</span> <span class="nx">App</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="p">&lt;</span><span class="nt">Container</span> <span class="na">maxW</span><span class="o">=</span><span class="p">{</span><span class="s2">&#34;container.lg&#34;</span><span class="p">}</span> <span class="na">py</span><span class="o">=</span><span class="p">{</span><span class="s2">&#34;10&#34;</span><span class="p">}&gt;</span>
+</span></span><span class="line"><span class="cl">      <span class="p">&lt;</span><span class="nt">Box</span> <span class="na">p</span><span class="o">=</span><span class="p">{</span><span class="mi">4</span><span class="p">}</span> <span class="na">rounded</span><span class="o">=</span><span class="s">&#34;md&#34;</span> <span class="na">shadow</span><span class="o">=</span><span class="p">{</span><span class="s2">&#34;base&#34;</span><span class="p">}</span> <span class="na">bg</span><span class="o">=</span><span class="p">{</span><span class="s2">&#34;gray.50&#34;</span><span class="p">}&gt;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">&lt;</span><span class="nt">AddressForm</span> <span class="p">/&gt;</span>
+</span></span><span class="line"><span class="cl">      <span class="p">&lt;/</span><span class="nt">Box</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">      <span class="p">&lt;</span><span class="nt">Box</span> <span class="na">mt</span><span class="o">=</span><span class="p">{</span><span class="mi">4</span><span class="p">}</span> <span class="na">p</span><span class="o">=</span><span class="p">{</span><span class="mi">4</span><span class="p">}</span> <span class="na">rounded</span><span class="o">=</span><span class="s">&#34;md&#34;</span> <span class="na">shadow</span><span class="o">=</span><span class="p">{</span><span class="s2">&#34;base&#34;</span><span class="p">}</span> <span class="na">bg</span><span class="o">=</span><span class="p">{</span><span class="s2">&#34;gray.50&#34;</span><span class="p">}&gt;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">&lt;</span><span class="nt">AddressSummary</span> <span class="p">/&gt;</span>
+</span></span><span class="line"><span class="cl">      <span class="p">&lt;/</span><span class="nt">Box</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">&lt;/</span><span class="nt">Container</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kr">export</span> <span class="k">default</span> <span class="nx">App</span><span class="p">;</span>
+</span></span></code></pre></div><p>Como resultado das implementações teremos a seguinte UI:</p>
+<p><img loading="lazy" src="/posts/zustand/images/app-initial.gif" type="" alt="Aplicação base"  title="Aplicação base"  /></p>
+<h1 id="criando-nosso-_store_-global">Criando nosso <em>store</em> global</h1>
+<p>Toda vez que criamos um estado no <strong>Zustand</strong>, por padrão este estado criado é
+global, ou seja, ele pode ser utilizado por toda a aplicação.</p>
+<p>O que é mais surpreendente, é que não é necessário encapsular nossos componentes
+dentro de um <em>provider</em> ou algo do tipo, basta somente consumir este estado
+global e pronto!</p>
+<p>Vamos agora criar este nosso estado global de <em><strong>Address</strong></em>:</p>
+<ol>
+<li>Primeiro, vamos definir a interface desse estado, nesta interface iremos
+definir quais são as propriedades e métodos deste objeto, as propriedades nos
+dirão quais os dados que podemos consumir e os métodos serão os responsáveis
+pela mutação destes dados.</li>
+</ol>
+<p><code>src/store/AddressStore.ts</code></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="line"><span class="cl"><span class="kr">interface</span> <span class="nx">Address</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">uf</span>: <span class="kt">string</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">address</span>: <span class="kt">string</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">complement?</span>: <span class="kt">string</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kr">export</span> <span class="kr">interface</span> <span class="nx">IAddressStore</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">address</span>: <span class="kt">Address</span> <span class="o">|</span> <span class="kc">null</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">setAddress</span><span class="o">:</span> <span class="p">(</span><span class="nx">address</span>: <span class="kt">Address</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="k">void</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span></span></span></code></pre></td></tr></table>
+</div>
+</div>
+<ol start="2">
+<li>Agora, com a interface definida, vamos criar o objeto que representará nosso estado global, o <em>store</em>, que exportaremos no formato de um <em><strong>hook</strong></em>:</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="line"><span class="cl"><span class="kr">import</span> <span class="nx">create</span> <span class="kr">from</span> <span class="s2">&#34;zustand&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// Código das interfaces (passo 1)
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl"><span class="kr">export</span> <span class="kr">const</span> <span class="nx">useAddressStore</span> <span class="o">=</span> <span class="nx">create</span><span class="p">&lt;</span><span class="nt">IAddressStore</span><span class="p">&gt;(</span><span class="kr">set</span> <span class="o">=&gt;</span> <span class="p">({</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">address</span>: <span class="kt">null</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">setAddress</span><span class="o">:</span> <span class="p">(</span><span class="nx">address</span><span class="p">)</span> <span class="o">=&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="kr">set</span><span class="p">({</span>
+</span></span><span class="line"><span class="cl">      <span class="nx">address</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}),</span>
+</span></span><span class="line"><span class="cl"><span class="p">}));</span></span></span></code></pre></td></tr></table>
+</div>
+</div>
+<h2 id="explicando-o-código-acima">Explicando o código acima</h2>
+<p>A função create, importada da biblioteca <strong>zustand</strong> é resposável por criar o <em>store</em> em si, ela recebe um tipo genérico que define a estrutura do <em>store</em>, indispensável para obtermos o <em>intellisense</em> no editor de texto, no meu caso, o <em>VSCode</em>.</p>
+<p>Esta função recebe uma função anônima como argumento, que é composta por dois parâmetros: <code>set</code> e <code>get</code>, e retorna um objeto de resposta que será a estrutura do nosso store, o seu tipo é definido pela interface que passamos como tipo genérico na chamada da função create.</p>
+<p>O parâmetro <code>set</code> é utilizado para definir as mutações dentro do nosso <em>store</em>, sempre que nós quisermos alterar alguma propriedade do nosso store, utilizaremos o parâmetro <code>set</code> para  fazê-lo, este parâmetro também é uma função, e esta função recebe como parâmetro um objeto que satisfaça a estrutura do nosso store, como por exemplo, um objeto do tipo <code>Address</code>.</p>
+<p>O parâmetro <code>get</code> é utilizado para recuperar uma propriedade do nosso <em>store</em>.</p>
+<h1 id="conectando-o-_store_-aos-componentes">Conectando o <em>store</em> aos componentes</h1>
+<p>Agora o próximo passo é utilizar o estado que criamos nos nossos componentes, primeiramente vamos conectar o componente <code>AddressSumary.tsx</code> ao store utilizando o <strong>hook</strong> que criamos.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="line"><span class="cl"><span class="kr">import</span> <span class="p">{</span> <span class="nx">Box</span><span class="p">,</span> <span class="nx">VStack</span><span class="p">,</span> <span class="nx">Text</span><span class="p">,</span> <span class="nx">Alert</span><span class="p">,</span> <span class="nx">AlertDescription</span><span class="p">,</span> <span class="nx">AlertIcon</span><span class="p">,</span> <span class="nx">AlertTitle</span> <span class="p">}</span> <span class="kr">from</span> <span class="s1">&#39;@chakra-ui/react&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="kr">import</span> <span class="nx">React</span> <span class="kr">from</span> <span class="s1">&#39;react&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="kr">import</span> <span class="p">{</span> <span class="nx">useAddressStore</span> <span class="p">}</span> <span class="kr">from</span> <span class="s1">&#39;../store/AddressStore&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kr">const</span> <span class="nx">AddressSummary</span>: <span class="kt">React.FC</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="kr">const</span> <span class="nx">address</span> <span class="o">=</span> <span class="nx">useAddressStore</span><span class="p">(</span><span class="nx">state</span> <span class="o">=&gt;</span> <span class="nx">state</span><span class="p">.</span><span class="nx">address</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="p">&lt;</span><span class="nt">VStack</span> <span class="na">spacing</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;4&#39;</span><span class="p">}</span> <span class="na">alignItems</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;start&#39;</span><span class="p">}&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">&lt;</span><span class="nt">Text</span> <span class="na">alignSelf</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;center&#39;</span><span class="p">}&gt;</span><span class="nx">Revise</span> <span class="kr">as</span> <span class="nx">informações</span> <span class="nx">abaixo</span> <span class="nx">antes</span> <span class="nx">de</span> <span class="nx">confirmar</span> <span class="nx">a</span> <span class="nx">compra</span><span class="p">&lt;/</span><span class="nt">Text</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="nx">address</span> <span class="o">?</span>
+</span></span><span class="line"><span class="cl">        <span class="p">&lt;&gt;</span>
+</span></span><span class="line"><span class="cl">          <span class="p">&lt;</span><span class="nt">Box</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">            <span class="p">&lt;</span><span class="nt">Text</span> <span class="na">fontWeight</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;bold&#39;</span><span class="p">}&gt;</span><span class="nx">Estado</span><span class="p">&lt;/</span><span class="nt">Text</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">            <span class="p">&lt;</span><span class="nt">Text</span> <span class="na">fontSize</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;lg&#39;</span><span class="p">}&gt;{</span><span class="nx">address</span><span class="p">.</span><span class="nx">uf</span><span class="p">}&lt;/</span><span class="nt">Text</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">          <span class="p">&lt;/</span><span class="nt">Box</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">          <span class="p">&lt;</span><span class="nt">Box</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">            <span class="p">&lt;</span><span class="nt">Text</span> <span class="na">fontWeight</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;bold&#39;</span><span class="p">}&gt;</span><span class="nx">Endereço</span><span class="p">&lt;/</span><span class="nt">Text</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">            <span class="p">&lt;</span><span class="nt">Text</span> <span class="na">fontSize</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;lg&#39;</span><span class="p">}&gt;{</span><span class="nx">address</span><span class="p">.</span><span class="nx">address</span><span class="p">}&lt;/</span><span class="nt">Text</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">          <span class="p">&lt;/</span><span class="nt">Box</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">          <span class="p">&lt;</span><span class="nt">Box</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">            <span class="p">&lt;</span><span class="nt">Text</span> <span class="na">fontWeight</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;bold&#39;</span><span class="p">}&gt;</span><span class="nx">Complemento</span><span class="p">&lt;/</span><span class="nt">Text</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">            <span class="p">&lt;</span><span class="nt">Text</span> <span class="na">fontSize</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;lg&#39;</span><span class="p">}&gt;{</span><span class="nx">address</span><span class="p">.</span><span class="nx">complement</span> <span class="o">||</span> <span class="s1">&#39;Sem complemento&#39;</span><span class="p">}&lt;/</span><span class="nt">Text</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">          <span class="p">&lt;/</span><span class="nt">Box</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">&lt;/&gt;</span>
+</span></span><span class="line"><span class="cl">        <span class="o">:</span>
+</span></span><span class="line"><span class="cl">        <span class="p">&lt;</span><span class="nt">Alert</span> <span class="na">rounded</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;md&#39;</span><span class="p">}</span> <span class="na">status</span><span class="o">=</span><span class="s">&#39;error&#39;</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">          <span class="p">&lt;</span><span class="nt">AlertIcon</span> <span class="p">/&gt;</span>
+</span></span><span class="line"><span class="cl">          <span class="p">&lt;</span><span class="nt">AlertTitle</span><span class="p">&gt;</span><span class="nx">Nenhum</span> <span class="nx">endereço</span> <span class="nx">cadastrado</span><span class="p">&lt;/</span><span class="nt">AlertTitle</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">&lt;/</span><span class="nt">Alert</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="p">&lt;/</span><span class="nt">VStack</span><span class="p">&gt;;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kr">export</span> <span class="k">default</span> <span class="nx">AddressSummary</span><span class="p">;</span></span></span></code></pre></td></tr></table>
+</div>
+</div>
+<p>Temos o a página de endereço conectada ao nosso <em>store</em>, como nosso <em>store</em> é inicializado com a propriedade <code>address: null</code>, neste primeiro momento teremos somente o componente de <code>Alert</code>:</p>
+<p><img loading="lazy" src="/posts/zustand/images/primeira-conexao-estado.png" type="" alt="Estado vazio"  title="Estado vazio"  /></p>
+<h2 id="salvando-os-dados-do-formulário-no-store">Salvando os dados do formulário no store</h2>
+<p>Agora, precisamos conectar o componente de formulário no <em>store</em>, tendo os seguintes comportamentos:</p>
+<ol>
+<li>No carregamento inicial do componente, os dados iniciais deverão ser carregados com o que está presente no <em>store</em>;</li>
+<li>Ao clicar em salvar, os dados presentes no formulário deverão ser salvos no <em>store</em>.</li>
+</ol>
+<h3 id="implementando-o-primeiro-comportamento">implementando o primeiro comportamento:</h3>
+<p><code>src/components/AddressForm.tsx</code>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-tsx" data-lang="tsx"><span class="line"><span class="cl">  <span class="kr">const</span> <span class="nx">addressStore</span> <span class="o">=</span> <span class="nx">useAddressStore</span><span class="p">(</span><span class="nx">store</span> <span class="o">=&gt;</span> <span class="nx">store</span><span class="p">.</span><span class="nx">address</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="nx">useEffect</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="nx">addressStore</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="nx">setUf</span><span class="p">(</span><span class="nx">addressStore</span><span class="p">.</span><span class="nx">uf</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">      <span class="nx">setAddress</span><span class="p">(</span><span class="nx">addressStore</span><span class="p">.</span><span class="nx">address</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">      <span class="nx">setComplement</span><span class="p">(</span><span class="nx">addressStore</span><span class="p">.</span><span class="nx">complement</span> <span class="o">??</span> <span class="s1">&#39;&#39;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="p">},</span> <span class="p">[</span><span class="nx">addressStore</span><span class="p">]);</span></span></span></code></pre></td></tr></table>
+</div>
+</div></p>
+<p>Como podemos observar, estamos nos inscrevendo no <em>store</em> de <em>address</em>, especificamente na propriedade <code>address</code> e sincronizando com o nosso state da aplicação através do <code>useEffect</code>, desta forma, quando houver alguma mudança na propriedade <code>address</code> e <strong>somente</strong> na propriedade <code>address</code> do nosso store, os dados serão sincronizados (ocasionando uma renderização do componente).</p>
+<h3 id="implementando-o-segundo-comportamento">Implementando o segundo comportamento</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-tsx" data-lang="tsx"><span class="line"><span class="cl">  <span class="kr">const</span> <span class="nx">setAddressStore</span> <span class="o">=</span> <span class="nx">useAddressStore</span><span class="p">(</span><span class="nx">store</span> <span class="o">=&gt;</span> <span class="nx">store</span><span class="p">.</span><span class="nx">setAddress</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="kr">const</span> <span class="nx">handleSubmit</span>: <span class="kt">React.FormEventHandler</span><span class="p">&lt;</span><span class="nt">HTMLDivElement</span><span class="p">&gt;</span> <span class="o">=</span> <span class="p">(</span><span class="nx">event</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">event</span><span class="p">.</span><span class="nx">preventDefault</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">setAddressStore</span><span class="p">({</span>
+</span></span><span class="line"><span class="cl">      <span class="nx">uf</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">      <span class="nx">address</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">      <span class="nx">complement</span>
+</span></span><span class="line"><span class="cl">    <span class="p">})</span>
+</span></span><span class="line"><span class="cl">  <span class="p">};</span></span></span></code></pre></td></tr></table>
+</div>
+</div>
+<p>De forma semelhante à que fizemos na implementação do primeiro comportamento, agora, selecionamos a porção do store que possui a função setAddres e a chamamos na função <code>handleSubmit</code>, responsável por lidar com o evento de envio do formulário de endereço.</p>
+<p>Agora a nossa aplicação está com o comportamento esperado:</p>
+<p><img loading="lazy" src="/posts/zustand/images/app-store-conectado.gif" type="" alt="Store conectado"  title="Store conectado"  /></p>
+<h1 id="persistindo-o-estado-da-aplicação-no-_localstorage_">Persistindo o estado da aplicação no <em>LocalStorage</em></h1>
+<p>Há porém um problema na nossa implementação, ao atualizar a página o estado da aplicação (que é mantido em memória) é apagado, nos levando a ter que preencher novamente o endereço, por sorte, a biblioteca <strong>Zustand</strong> possui os <em><strong>Middlewares</strong></em>, que são funcionalidades extras que podemos anexar ao nosso store criado, e um dos middlewares que vêm junto com a biblioteca é o Middleware de persistência, que iremos implementar agora.</p>
+<p><code>src/store/AddressStore.ts</code>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="line"><span class="cl"><span class="kr">import</span> <span class="nx">create</span> <span class="kr">from</span> <span class="s2">&#34;zustand&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="kr">import</span> <span class="p">{</span> <span class="nx">persist</span> <span class="p">}</span> <span class="kr">from</span> <span class="s2">&#34;zustand/middleware&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// Codigo das interfaces
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl"><span class="kr">export</span> <span class="kr">const</span> <span class="nx">useAddressStore</span> <span class="o">=</span> <span class="nx">create</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">persist</span><span class="p">&lt;</span><span class="nt">IAddressStore</span><span class="p">&gt;(</span><span class="kr">set</span> <span class="o">=&gt;</span> <span class="p">({</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">address</span>: <span class="kt">null</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">setAddress</span><span class="o">:</span> <span class="p">(</span><span class="nx">address</span><span class="p">)</span> <span class="o">=&gt;</span>
+</span></span><span class="line"><span class="cl">      <span class="kr">set</span><span class="p">({</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">address</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">      <span class="p">}),</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}),</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;address-store&#39;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">);</span></span></span></code></pre></td></tr></table>
+</div>
+</div></p>
+<p>Para implementar o middleware de persistência é muito simples, basta importar o <code>persist</code> de dentro do módulo <code>zustand/middleware</code> e colocar tudo que ficava dentro do <code>create</code> para dentro da chamada desta função <code>persist</code>, colocar o tipo genérico que ficava em <code>create</code> em <code>persist</code> e enfim, adicionar um segundo parâmetro dentro da chamada à função <code>persist</code> que será a configuração deste middleware de persistência, neste caso colocarei apenas uma chave chamada name, identificando no <code>localstorage</code> que se trata do estado guardado correspondente ao <code>store</code> de <code>address</code>.</p>
+<h1 id="conclusão">Conclusão</h1>
+<p>Ainda tem bastante coisa para discutir dentro do tópico de zustand, contudo com o que vimos, é realmente muito simples implementar o <code>zustand</code> dentro das nossas aplicações React para obter um gerenciamento de estado global com poucas linhas de código.</p>
+<p>Sem dúvidas, ainda tem bastante coisa que podemos discutir e explorar dentro dessa biblioteca fenomenal, podem esperar mais conteúdo sobre ela.
+Abraços!!</p>
+]]></content:encoded>
+    </item>
+    
+  </channel>
+</rss>
