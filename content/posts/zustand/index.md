@@ -19,6 +19,10 @@ para conseguir atingir uma funcionalidade básica.
 Neste artigo iremos utilizar um gerenciador de estado leve, rápido e de fácil
 utilização chamado _**zustand**_ para resolver um problema de gerenciamento de estado de uma aplicação e vamos analisar suas principais características e pontos fortes.
 
+> Para abrir o projeto completo, acesse através do [github](hypeit-brasil/zustand) ou clique no botão abaixo para abrir diretamente no _stackblitz_
+
+[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/hypeit-brasil/zustand)
+
 # Setup
 
 Primeiramente, iremos criar uma nova aplicação react, neste tutorial

@@ -85,7 +85,7 @@ params:
     homeInfoParams:
         Title: "HypeIT"
         Content: >
-            Bem vindo ao blog do HypeIT, aqui você encontrará conteúdos sobre tecnologia que te ajudarão a desenvolver o seu produto digital.
+            Bem vindo ao blog do HypeIT, aqui você encontrará conteúdos sobre tecnologia que te ajudarão a desenvolver o seu produto digital e evoluir na carreira. Não se esqueça de conferir o nosso canal no youtube!
     socialIcons:
         - name: github
           url: "https://github.com/adityatelange/hugo-PaperMod"
