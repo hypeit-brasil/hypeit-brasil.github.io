@@ -27,6 +27,11 @@ utilização é um bocado <em><strong>verbosa</strong></em>, necessitando de mui
 para conseguir atingir uma funcionalidade básica.</p>
 <p>Neste artigo iremos utilizar um gerenciador de estado leve, rápido e de fácil
 utilização chamado <em><strong>zustand</strong></em> para resolver um problema de gerenciamento de estado de uma aplicação e vamos analisar suas principais características e pontos fortes.</p>
+<blockquote>
+<p>Para abrir o projeto completo, acesse através do <a href="hypeit-brasil/zustand">github</a> ou clique no botão abaixo para abrir diretamente no <em>stackblitz</em></p>
+</blockquote>
+<p><a href="https://stackblitz.com/github/hypeit-brasil/zustand">
+  <img loading="lazy" src="https://developer.stackblitz.com/img/open_in_stackblitz.svg" alt="Open in StackBlitz"  /></a></p>
 <h1 id="setup">Setup</h1>
 <p>Primeiramente, iremos criar uma nova aplicação react, neste tutorial
 utilizaremos o <strong>vite</strong>.</p>
