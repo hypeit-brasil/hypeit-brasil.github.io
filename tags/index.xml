@@ -4,6 +4,10 @@
     <title>Tags on HypeIT</title>
     <link>https://hypeit.tech/tags/</link>
     <description>Recent content in Tags on HypeIT</description>
+    <image>
+      <url>https://hypeit.tech/logo.jpg</url>
+      <link>https://hypeit.tech/logo.jpg</link>
+    </image>
     <generator>Hugo -- gohugo.io</generator>
     <lastBuildDate>Sun, 06 Nov 2022 02:19:57 -0300</lastBuildDate><atom:link href="https://hypeit.tech/tags/index.xml" rel="self" type="application/rss+xml" />
     <item>

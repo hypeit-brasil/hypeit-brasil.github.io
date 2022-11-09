@@ -4,6 +4,10 @@
     <title>Categorias on HypeIT</title>
     <link>https://hypeit.tech/categorias/</link>
     <description>Recent content in Categorias on HypeIT</description>
+    <image>
+      <url>https://hypeit.tech/logo.jpg</url>
+      <link>https://hypeit.tech/logo.jpg</link>
+    </image>
     <generator>Hugo -- gohugo.io</generator><atom:link href="https://hypeit.tech/categorias/index.xml" rel="self" type="application/rss+xml" />
   </channel>
 </rss>
