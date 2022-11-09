@@ -2,33 +2,33 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>https://hypeit.tech/tags/gerenciamento-de-estado/</loc>
+    <loc>https://blog.hypeit.tech/tags/gerenciamento-de-estado/</loc>
     <lastmod>2022-11-06T02:19:57-03:00</lastmod>
   </url><url>
-    <loc>https://hypeit.tech/posts/zustand/</loc>
+    <loc>https://blog.hypeit.tech/posts/zustand/</loc>
     <lastmod>2022-11-06T02:19:57-03:00</lastmod>
   </url><url>
-    <loc>https://hypeit.tech/</loc>
+    <loc>https://blog.hypeit.tech/</loc>
     <lastmod>2022-11-06T02:19:57-03:00</lastmod>
   </url><url>
-    <loc>https://hypeit.tech/posts/</loc>
+    <loc>https://blog.hypeit.tech/posts/</loc>
     <lastmod>2022-11-06T02:19:57-03:00</lastmod>
   </url><url>
-    <loc>https://hypeit.tech/tags/react/</loc>
+    <loc>https://blog.hypeit.tech/tags/react/</loc>
     <lastmod>2022-11-06T02:19:57-03:00</lastmod>
   </url><url>
-    <loc>https://hypeit.tech/tags/</loc>
+    <loc>https://blog.hypeit.tech/tags/</loc>
     <lastmod>2022-11-06T02:19:57-03:00</lastmod>
   </url><url>
-    <loc>https://hypeit.tech/tags/vite/</loc>
+    <loc>https://blog.hypeit.tech/tags/vite/</loc>
     <lastmod>2022-11-06T02:19:57-03:00</lastmod>
   </url><url>
-    <loc>https://hypeit.tech/archives/</loc>
+    <loc>https://blog.hypeit.tech/archives/</loc>
   </url><url>
-    <loc>https://hypeit.tech/categorias/</loc>
+    <loc>https://blog.hypeit.tech/categorias/</loc>
   </url><url>
-    <loc>https://hypeit.tech/search/</loc>
+    <loc>https://blog.hypeit.tech/search/</loc>
   </url><url>
-    <loc>https://hypeit.tech/series/</loc>
+    <loc>https://blog.hypeit.tech/series/</loc>
   </url>
 </urlset>

@@ -2,20 +2,20 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
     <title>HypeIT</title>
-    <link>https://hypeit.tech/</link>
+    <link>https://blog.hypeit.tech/</link>
     <description>Recent content on HypeIT</description>
     <image>
-      <url>https://hypeit.tech/logo.jpg</url>
-      <link>https://hypeit.tech/logo.jpg</link>
+      <url>https://blog.hypeit.tech/logo.jpg</url>
+      <link>https://blog.hypeit.tech/logo.jpg</link>
     </image>
     <generator>Hugo -- gohugo.io</generator>
-    <lastBuildDate>Sun, 06 Nov 2022 02:19:57 -0300</lastBuildDate><atom:link href="https://hypeit.tech/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 06 Nov 2022 02:19:57 -0300</lastBuildDate><atom:link href="https://blog.hypeit.tech/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Gerenciando estado no React com Zustand</title>
-      <link>https://hypeit.tech/posts/zustand/</link>
+      <link>https://blog.hypeit.tech/posts/zustand/</link>
       <pubDate>Sun, 06 Nov 2022 02:19:57 -0300</pubDate>
       
-      <guid>https://hypeit.tech/posts/zustand/</guid>
+      <guid>https://blog.hypeit.tech/posts/zustand/</guid>
       <description>Você certamente já se deparou com a necessidade de consumir um estado compartilhado entre vários componentes no React em lugares distintos de sua aplicação e certamente já ouviu falar sobre o Redux como uma ferramenta robusta de gerenciar o estado.
 Embora muito utilizado e bem documentado, é inegável que muitas vezes sua utilização é um bocado verbosa, necessitando de muito boilerplate para conseguir atingir uma funcionalidade básica.
 Neste artigo iremos utilizar um gerenciador de estado leve, rápido e de fácil utilização chamado zustand para resolver um problema de gerenciamento de estado de uma aplicação e vamos analisar suas principais características e pontos fortes.</description>
