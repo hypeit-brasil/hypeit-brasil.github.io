@@ -46,11 +46,15 @@ outputs:
         - JSON
 
 params:
+    googleAnalyticsID: G-JR3L1XRW5S
     env: production # to enable google analytics, opengraph, twitter-cards and schema.
     description: "Theme PaperMod - https://github.com/hypeit-brasil?tab=repositories"
     author: Kaique Lisboa
     # author: ["Me", "You"] # multiple authors
-
+    logo:
+      icon: /logo.jpg
+      iconHeight: 40
+      iconWidth: 40
     defaultTheme: auto
     # disableThemeToggle: true
     ShowShareButtons: true
